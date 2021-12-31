@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 4.1.3 (Python 3.7.5 on win32)" generated="20211231 15:42:44.690" rpa="false" schemaversion="2">
-<suite id="s1" name="Robot Interactive Console" source="c:\Users\dungp\.vscode\extensions\robocorp.robotframework-lsp-0.35.0\src\robotframework_ls\vendored\robotframework_interactive\robot_interactive_console.robot">
-<test id="s1-t1" name="Default Task/Test">
-<kw name="Interpreter Main Loop" library="MainLoop">
-<status status="PASS" starttime="20211231 15:42:44.719" endtime="20211231 15:42:51.088"/>
-</kw>
-<status status="PASS" starttime="20211231 15:42:44.719" endtime="20211231 15:42:51.089"/>
+<robot generator="Robot 4.1.3 (Python 3.7.5 on win32)" generated="20211231 21:48:34.166" rpa="true" schemaversion="2">
+<suite id="s1" name="Tasks" source="c:\DATA\RPA\01-Robocorp\my-rsb-robot-2\tasks.robot">
+<test id="s1-t1" name="Get">
+<status status="FAIL" starttime="20211231 21:48:36.308" endtime="20211231 21:48:36.310">Task case contains no keywords.</status>
 </test>
-<status status="PASS" starttime="20211231 15:42:44.691" endtime="20211231 15:42:51.089"/>
+<doc>Orders robots from RobotSpareBin Industries Inc.</doc>
+<status status="FAIL" starttime="20211231 21:48:34.170" endtime="20211231 21:48:36.313"/>
 </suite>
 <statistics>
 <total>
-<stat pass="1" fail="0" skip="0">All Tests</stat>
+<stat pass="0" fail="1" skip="0">All Tasks</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat pass="1" fail="0" skip="0" id="s1" name="Robot Interactive Console">Robot Interactive Console</stat>
+<stat pass="0" fail="1" skip="0" id="s1" name="Tasks">Tasks</stat>
 </suite>
 </statistics>
 <errors>

@@ -1,6 +1,11 @@
 *** Settings ***
 Documentation     Orders robots from RobotSpareBin Industries Inc.
-Library    RPA.Browser.Selenium    auto_close=${FALSE}
+...               Saves the order HTML receipt as a PDF file.
+...               Saves the screenshot of the ordered robot.
+...               Embeds the screenshot of the robot to the PDF receipt.
+...               Creates ZIP archive of the receipts and the images.
+Library    RPA.Browser.Selenium    auto_close=${False}
+Library    RPA.Robocorp.Vault
 Library    RPA.HTTP   
 Library    RPA.Excel.Files
 Library    RPA.PDF
@@ -10,6 +15,10 @@ Library    RPA.FileSystem
 Library    RPA.Archive
 
 *** Tasks ***
+Get and log the value of the vault secrets using the Get Secret keyword
+    ${settings}=    Get Secret    settings
+    Log    ${settings}[vsb_web_url]
+    Log    ${settings}[vsb_oder_data_url]
 Order robots from RobotSpareBin Industries Inc
     Open the robot order website
     ${orders}=    Get orders
@@ -20,13 +29,14 @@ Order robots from RobotSpareBin Industries Inc
         ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
         Submit the order
         ${error}=    Is Element Visible    css:div.alert-danger
-        IF    ${error} == ${TRUE}
-            Log    ${row}[Order number]: Submit failed
-            # Get Text    locator
+        IF    ${error} == ${True}
+            ${error_message}=    Get Text    css:div.alert-danger
+            Log    Oder ${row}[Order number]: Submit failed with error: ${error_message}
+            
         ELSE
             ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
             Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
-            Log    ${row}[Order number]: Submit successfully
+            Log    Oder ${row}[Order number]: Submit successfully
             Go to order another robot 
         END
     END
@@ -34,15 +44,15 @@ Order robots from RobotSpareBin Industries Inc
     Close Browser
 *** Keywords ***
 Open the robot order website
-    Open Available Browser    https://robotsparebinindustries.com/#/robot-order    maximized=${TRUE}    
+    Open Available Browser    ${settings}[vsb_web_url]    maximized=${True}    
 Get orders
-    Download    https://robotsparebinindustries.com/orders.csv    overwrite=True
-    ${csv_data}  Read table from CSV    orders.csv    header={TRUE}
+    Download    ${settings}[vsb_oder_data_url]    overwrite=${True}
+    ${csv_data}  Read table from CSV    orders.csv    header=${True}
     [Return]    ${csv_data}
 Close the annoying modal
     Wait Until Element Is Visible    id:preview
     ${btn_OK_visible}=    Is Element Visible    xpath:/html/body/div/div/div[2]/div/div/div/div/div/button[1]
-    IF    ${btn_OK_visible} == ${TRUE}
+    IF    ${btn_OK_visible} == ${True}
         Click Element When Visible    xpath:/html/body/div/div/div[2]/div/div/div/div/div/button[1]   
     ELSE
         Log    button OK not visible  
