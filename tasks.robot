@@ -15,13 +15,13 @@ Library    RPA.FileSystem
 Library    RPA.Archive
 
 *** Tasks ***
-Get and log the value of the vault secrets using the Get Secret keyword
-    ${settings}=    Get Secret    settings
-    Log    ${settings}[vsb_web_url]
-    Log    ${settings}[vsb_oder_data_url]
 Order robots from RobotSpareBin Industries Inc
-    Open the robot order website
-    ${orders}=    Get orders
+    # Get and log the value of the vault secrets using the Get Secret keyword
+    ${settings}=    Get Secret    settings
+    # Start process
+    ${orders}=    Get orders    ${settings}[vsb_oder_data_url]
+    Log    Starting oder robot!
+    Open the robot order website    ${settings}[vsb_web_url]
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
         Fill the form    ${row}
@@ -42,11 +42,14 @@ Order robots from RobotSpareBin Industries Inc
     END
     Create a ZIP file of the receipts
     Close Browser
+    
 *** Keywords ***
 Open the robot order website
-    Open Available Browser    ${settings}[vsb_web_url]    maximized=${True}    
+    [Arguments]    ${vsb_web_url}
+    Open Available Browser    ${vsb_web_url}    maximized=${True}    
 Get orders
-    Download    ${settings}[vsb_oder_data_url]    overwrite=${True}
+    [Arguments]    ${vsb_oder_data_url}
+    Download    ${vsb_oder_data_url}    overwrite=${True}
     ${csv_data}  Read table from CSV    orders.csv    header=${True}
     [Return]    ${csv_data}
 Close the annoying modal
