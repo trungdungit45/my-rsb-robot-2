@@ -13,15 +13,19 @@ Library    RPA.Tables
 Library    Dialogs
 Library    RPA.FileSystem
 Library    RPA.Archive
+Variables   variables.py
 
 *** Tasks ***
 Order robots from RobotSpareBin Industries Inc
     # Get and log the value of the vault secrets using the Get Secret keyword
     ${settings}=    Get Secret    settings
+    Log    ${settings}[rsb_oder_data_url]     # Oder data url
+    Log    ${settings}[rsb_web_url]    # RSB website oder url
+
     # Start process
-    ${orders}=    Get orders    ${settings}[vsb_oder_data_url]
+    ${orders}=    Get orders    ${settings}[rsb_oder_data_url]
     Log    Starting oder robot!
-    Open the robot order website    ${settings}[vsb_web_url]
+    Open the robot order website    ${settings}[rsb_web_url]
     FOR    ${row}    IN    @{orders}
         Close the annoying modal
         Fill the form    ${row}
@@ -45,11 +49,11 @@ Order robots from RobotSpareBin Industries Inc
     
 *** Keywords ***
 Open the robot order website
-    [Arguments]    ${vsb_web_url}
-    Open Available Browser    ${vsb_web_url}    maximized=${True}    
+    [Arguments]    ${rsb_web_url}
+    Open Available Browser    ${rsb_web_url}    maximized=${True}    
 Get orders
-    [Arguments]    ${vsb_oder_data_url}
-    Download    ${vsb_oder_data_url}    overwrite=${True}
+    [Arguments]    ${rsb_oder_data_url}
+    Download    ${rsb_oder_data_url}    overwrite=${True}
     ${csv_data}  Read table from CSV    orders.csv    header=${True}
     [Return]    ${csv_data}
 Close the annoying modal
