@@ -10,13 +10,14 @@ Library    RPA.HTTP
 Library    RPA.Excel.Files
 Library    RPA.PDF
 Library    RPA.Tables
-Library    Dialogs
+Library    RPA.Dialogs
 Library    RPA.FileSystem
 Library    RPA.Archive
 Variables   variables.py
 
 *** Tasks ***
 Order robots from RobotSpareBin Industries Inc
+    ${retry_times}=    Input form dialog
     # Get and log the value of the vault secrets using the Get Secret keyword
     ${settings}=    Get Secret    settings
     Log    ${settings}[rsb_oder_data_url]     # Oder data url
@@ -27,27 +28,33 @@ Order robots from RobotSpareBin Industries Inc
     Log    Starting oder robot!
     Open the robot order website    ${settings}[rsb_web_url]
     FOR    ${row}    IN    @{orders}
-        Close the annoying modal
-        Fill the form    ${row}
-        Preview the robot
-        ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
-        Submit the order
-        ${error}=    Is Element Visible    css:div.alert-danger
-        IF    ${error} == ${True}
-            ${error_message}=    Get Text    css:div.alert-danger
-            Log    Oder ${row}[Order number]: Submit failed with error: ${error_message}
-            
-        ELSE
-            ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
-            Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
-            Log    Oder ${row}[Order number]: Submit successfully
-            Go to order another robot 
-        END
+        Wait Until Keyword Succeeds    ${retry_times}[retry_time]x    2s    Process Oder    ${row}
     END
     Create a ZIP file of the receipts
     Close Browser
     
 *** Keywords ***
+Input form dialog
+    Add heading     Select retry times
+    Add drop-down
+    ...    name=retry_time
+    ...    options=3,4,5
+    ...    default=3
+    ...    label=Retry times
+    ${result}=      Run dialog
+    [Return]    ${result}
+Process Oder
+    [Arguments]    ${row}
+    Close the annoying modal
+    Fill the form    ${row}
+    Preview the robot
+    ${screenshot}=    Take a screenshot of the robot    ${row}[Order number]
+    Submit the order
+    ${pdf}=    Store the receipt as a PDF file    ${row}[Order number]
+    Embed the robot screenshot to the receipt PDF file    ${screenshot}    ${pdf}
+    Log    Oder ${row}[Order number]: Submit successfully
+    Go to order another robot 
+
 Open the robot order website
     [Arguments]    ${rsb_web_url}
     Open Available Browser    ${rsb_web_url}    maximized=${True}    
